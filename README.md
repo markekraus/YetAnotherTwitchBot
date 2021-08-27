@@ -1,6 +1,6 @@
 # Yet Another Twitch Bot
 
-A C#/Blazor Twitch Bot with a web UI for managing settings, joining/leaving channels, and enabling/disabling/commands.
+A C#/Blazor Twitch Bot with a web UI for managing settings, joining/leaving channels, and enabling/disabling commands.
 
 ## Supported Commands
 
