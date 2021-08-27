@@ -1,0 +1,49 @@
+@page "/spotify"
+@using Microsoft.Extensions.Options
+@using Services
+@using SpotifyAPI.Web
+@using YetAnotherTwitchBot.Options
+
+<h1>Spotify</h1>
+@if (_service.IsAuthenticated() && !_service.IsLoaded())
+{
+  <h3>Spotify is authenticated.</h3>
+  <p>Please allow a few minutes for tracks to be cached from Spotify.</p>
+}
+else if(_service.IsAuthenticated() && _service.IsLoaded())
+{
+    <h3>Spotify is authenticated and ready!</h3>
+}
+else
+{
+  <span>To get started:</span>
+  <ol>
+      <li><a href="/settings">Set your Client ID</a></li>
+      <li><a href="/settings">Set your Cleint Secret</a></li>
+      <li><a href="@_authUri">Login via Spotify</a></li>
+  </ol>
+  
+  <span>Callback URI: @_callbackUri</span>
+}
+
+@code {
+
+    [Inject]
+    public IOptionsMonitor<SpotifyOptions> _options { get; set; }
+    [Inject]
+    public SpotifyHandler _service { get; set; }
+    [Inject]
+    public SettingsHelper _settingsHelper { get; set; }
+    [Inject]
+    public NavigationManager navManager { get; set; }
+    private Uri _authUri;
+    private Uri _callbackUri;
+    protected override void OnInitialized()
+    {
+        var clientId = _options.CurrentValue.ClientId;
+        _callbackUri = navManager.ToAbsoluteUri("/spotifycallback");
+
+        var loginRequest = _service.GetLoginRequest(_callbackUri);
+        _authUri = loginRequest.ToUri();
+    }
+}

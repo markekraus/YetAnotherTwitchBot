@@ -1,0 +1,61 @@
+@page "/DevHelper"
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.Extensions.Hosting
+@using YetAnotherTwitchBot.Services
+@inject DevHelperService _service
+@inject IWebHostEnvironment env
+
+@if (env.IsDevelopment())
+{
+<table>
+    <tr>
+        <th>Setting</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td>Twitch:IrcPassword</td>
+        <td>@_service.GetConfigValue("Twitch:IrcPassword")</td>
+    </tr>
+    <tr>
+        <td>Bot Command Count</td>
+        <td>@_service.GetCommandCount()</td>
+    </tr>
+    <tr>
+        <td>Options - BotIrcPassword</td>
+        <td>@_service.GetCurrentTwitchOptionValues().CurrentValue.BotIrcPassword</td>
+    </tr>
+    <tr>
+        <td>Options - BotUsername</td>
+        <td>@_service.GetCurrentTwitchOptionValues().CurrentValue.BotUsername</td>
+    </tr>
+    <tr>
+        <td>Options - StreamerUsername</td>
+        <td>@_service.GetCurrentTwitchOptionValues().CurrentValue.StreamerUsername</td>
+    </tr>
+    <tr>
+        <td>Channels</td>
+        <td>@string.Join(" ",_service.GetCurrentTwitchOptionValues().CurrentValue.Channels)</td>
+    </tr>
+    <tr>
+        <td>ApplicationName</td>
+        <td>@env.ApplicationName</td>
+    </tr>
+    <tr>
+        <td>ContentRootPath</td>
+        <td>@env.ContentRootPath</td>
+    </tr>
+    <tr>
+        <td>EnvironmentName</td>
+        <td>@env.EnvironmentName</td>
+    </tr>
+    <tr>
+        <td>WebRootPath</td>
+        <td>@env.WebRootPath</td>
+    </tr>
+</table>
+}
+
+
+@code {
+
+}

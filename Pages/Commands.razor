@@ -1,0 +1,52 @@
+@page "/commands"
+@using Interfaces
+@using Microsoft.Extensions.Configuration
+@using Options
+@using Microsoft.Extensions.Logging
+@using Services
+
+<h1>Commands</h1>
+
+<EditForm Model="@model" OnValidSubmit="@HandleValidSubmit">
+@foreach (var commandOption in model.CommandSettings)
+{
+    <hr />
+    <h3>@commandOption.CommandName</h3>
+    <p>@commandOption.GetBotCommand().GetCommandDescription()</p>
+    <div class="form-group row">
+        <label for="@commandOption.CommandName" class="col-sm-2 col-form-label">
+            Enabled: 
+        </label>
+        <div class="col-sm-10">
+            <InputCheckbox id="@commandOption.CommandName" @bind-Value="commandOption.Enabled" />
+        </div>
+    </div>
+}
+    <div class="form-group row">
+        <button type="submit" class="btn btn-primary">Update</button>
+    </div>
+</EditForm>
+
+@code {
+    [Inject]
+    public IConfiguration configuration { get; set; }
+    [Inject]
+    public ILogger<Commands> _logger { get; set; }
+    [Inject]
+    public SettingsHelper _settingsHelper {get; set; }
+    [Inject]
+    IBotCommandService _service { get; set; }
+    public CommandManagementOptions model = new CommandManagementOptions();
+    protected async override Task OnInitializedAsync()
+    {
+        await Task.Run(() =>
+        {
+            model.CommandSettings = _service.GetBotCommandOptions();
+        });
+    }
+
+    private void HandleValidSubmit()
+    {
+        _settingsHelper.AddOrUpdateAppSetting<CommandManagementOptions>(CommandManagementOptions.Section, model);
+    }
+}

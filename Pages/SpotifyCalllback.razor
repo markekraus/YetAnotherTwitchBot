@@ -1,0 +1,23 @@
+@page "/spotifycallback"
+@using Microsoft.AspNetCore.WebUtilities
+@using Services
+
+Processing...
+
+@code {
+    [Inject]
+    public NavigationManager NavManager { get; set; }
+    [Inject]
+    public SpotifyHandler _service { get; set; }
+    protected async override Task OnInitializedAsync()
+    {
+        var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+        var callbackUri = NavManager.ToAbsoluteUri("/spotifycallback");
+        var query = QueryHelpers.ParseQuery(uri.Query);
+        if(query.TryGetValue("code", out var code))
+        {
+            await _service.AuthorizeClient(code.ToString(),callbackUri);
+            NavManager.NavigateTo("/spotify");
+        }
+    }
+}

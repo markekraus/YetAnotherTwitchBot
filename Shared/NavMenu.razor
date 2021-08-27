@@ -1,0 +1,59 @@
+﻿@using Microsoft.AspNetCore.Hosting
+@using Microsoft.Extensions.Hosting
+@inject IWebHostEnvironment env
+
+<div class="top-row pl-4 navbar navbar-dark">
+    <a class="navbar-brand" href="">Yet Another Twitch Bot</a>
+    <button class="navbar-toggler" @onclick="ToggleNavMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <ul class="nav flex-column">
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="commands">
+                <span class="oi oi-command" aria-hidden="true"></span> Commands
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="spotify">
+                <span class="oi oi-audio" aria-hidden="true"></span> Spotify
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="settings">
+                <span class="oi oi-cog" aria-hidden="true"></span> Settings
+            </NavLink>
+        </li>
+        @if (env.IsDevelopment())
+        {
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="DevHelper">
+                <span class="oi oi-code" aria-hidden="true"></span> Dev Helper
+            </NavLink>
+        </li>
+        }
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="about">
+                <span class="oi oi-info" aria-hidden="true"></span> About
+            </NavLink>
+        </li>
+    </ul>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}
