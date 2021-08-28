@@ -15,17 +15,19 @@ public static class ServicesConfiguration
         this IServiceCollection services,
         IConfiguration Configuration)
     {
+        // Twitch Bot Services
         services.Configure<ClientOptions>(_options => {
                 _options.MessagesAllowedInPeriod = 750;
                 _options.ThrottlingPeriod = TimeSpan.FromSeconds(30);
                 _options.ReconnectionPolicy = new ReconnectionPolicy(3000,3000,100);
             });
         services.Configure<TwitchOptions>(Configuration.GetSection(TwitchOptions.Section));
-        services.Configure<SpotifyOptions>(Configuration.GetSection(SpotifyOptions.Section));
         services.Configure<CommandManagementOptions>(Configuration.GetSection(CommandManagementOptions.Section));
         services.AddSingleton<SettingsHelper>();
         services.AddTransient<ITwitchClient, TwitchClient>();
         services.AddSingleton<IBotCommandService, BotCommandService>();
+
+        // Dev Helper
         services.AddSingleton<DevHelperService>();
 
         // Test Command
@@ -40,6 +42,7 @@ public static class ServicesConfiguration
         services.AddSingleton<IBotCommand, IssLocationCommand>();
 
         // Spotify
+        services.Configure<SpotifyOptions>(Configuration.GetSection(SpotifyOptions.Section));
         services.AddSingleton<SpotifyHandler>();
         services.AddSingleton<IBotCommand, PlayRandomCommand>();
         services.AddSingleton<IBotCommand, UndoPlayRandomCommand>();
@@ -50,5 +53,9 @@ public static class ServicesConfiguration
 
         // Roll command
         services.AddSingleton<IBotCommand, RollCommand>();
+
+        // Text Commands
+        services.Configure<TextCommandsOptions>(Configuration.GetSection(TextCommandsOptions.Section));
+
     }
 }

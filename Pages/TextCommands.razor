@@ -1,0 +1,166 @@
+@page "/textcommands"
+@using Microsoft.Extensions.Configuration
+@using Microsoft.Extensions.Options
+@using Models
+@using Services
+@using YetAnotherTwitchBot.Options
+
+<h1>Text Commands</h1>
+<EditForm Model="@Commands" OnValidSubmit="@HandleValidSubmit">
+@foreach (var command in Commands)
+{
+    <hr />
+    <div class="form-group row">
+        <label class="col-sm-2 col-form-label">
+            Enabled:
+        </label>
+        <div class="col-sm-10">
+            <InputCheckbox class="form-control"
+                       @bind-Value="command.Enabled" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-2 col-form-label">
+            Command:
+        </label>
+        <div class="col-sm-10">
+            <InputText class="form-control" placeholder="!somecommand"
+                       @bind-Value="command.Command" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-2 col-form-label">
+            Command Template:
+        </label>
+        <div class="col-sm-10">
+            <InputText class="form-control" placeholder="Some template text"
+                       @bind-Value="command.Template" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <button class="btn btn-danger"  @onclick="@(() => RemoveCommand(command))">Remove</button>
+    </div>
+}
+    <hr />
+    <h4> Add New Command</h4>
+    <div class="form-group row">
+        <label class="col-sm-2 col-form-label">
+            Enabled:
+        </label>
+        <div class="col-sm-10">
+            <InputCheckbox class="form-control"
+                       @bind-Value="NewCommand.Enabled" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-2 col-form-label">
+            Command:
+        </label>
+        <div class="col-sm-10">
+            <InputText class="form-control" placeholder="!somecommand"
+                       @bind-Value="NewCommand.Command" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-2 col-form-label">
+            Response Template:
+        </label>
+        <div class="col-sm-10">
+            <InputText class="form-control" placeholder="Some template text"
+                       @bind-Value="NewCommand.Template" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <button class="btn btn-success"  @onclick="AddCommand">Add</button>
+    </div>
+    <hr />
+    <h3>Admin Users</h3>
+@foreach (var user in AdminUsers)
+{
+    <div class="form-group row">
+        <div class="col-sm-10">
+            <InputText class="form-control" placeholder="SomeTwitchUser"
+                       @bind-Value="user.Username" />
+        </div>
+        <div class="col-sm-10">
+            <button class="btn btn-danger"  @onclick="@(() => RemoveAdminUser(user))">Remove</button>
+        </div>
+    </div>
+}
+    <hr />
+    <h4>Add Admin User</h4>
+    <div class="form-group row">
+        <div class="col-sm-10">
+            <InputText class="form-control" placeholder="SomeTwitchUser"
+                       @bind-Value="NewAdminUser.Username" />
+        </div>
+        <div class="col-sm-10">
+            <button class="btn btn-success"  @onclick="AddAdminUser">Add</button>
+        </div>
+    </div>
+    <hr />
+    <div class="form-group row">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </div>
+</EditForm>
+
+@code {
+    [Inject]
+    public SettingsHelper _settingsHelper { get; set; }
+    [Inject]
+    private IOptionsMonitor<TextCommandsOptions> CommandOptions { get; set; }
+    public IList<TextCommandsItem> Commands { get; set; } = new List<TextCommandsItem>();
+    public IList<TextCommandAdminUser> AdminUsers { get; set; } = new List<TextCommandAdminUser>();
+    public TextCommandAdminUser NewAdminUser { get; set; } = new TextCommandAdminUser();
+    public TextCommandsItem NewCommand { get; set; } = new TextCommandsItem();
+
+    protected async override Task OnInitializedAsync()
+    {
+        await Task.Run(() =>
+        {
+            Commands = new List<TextCommandsItem>(CommandOptions.CurrentValue.Commands);
+            AdminUsers = new List<TextCommandAdminUser>(CommandOptions.CurrentValue.AdminUsers);
+        });
+    }
+
+    private void HandleValidSubmit()
+    {
+        var options = new TextCommandsOptions()
+        {
+            AdminUsers = AdminUsers,
+            Commands = Commands
+        };
+        _settingsHelper.AddOrUpdateAppSetting<TextCommandsOptions>(TextCommandsOptions.Section, options);
+    }
+
+    private void AddCommand()
+    {
+        Commands.Add(NewCommand);
+        NewCommand = new TextCommandsItem();
+    }
+
+    private void AddAdminUser()
+    {
+        if (!string.IsNullOrWhiteSpace(NewAdminUser.Username))
+        {
+            AdminUsers.Add(NewAdminUser);
+            NewAdminUser = new TextCommandAdminUser();
+        }
+    }
+
+    private async Task RemoveCommand(TextCommandsItem Command)
+    {
+        await Task.Run(() =>
+        {
+            Commands.Remove(Command);
+        });
+    }
+
+    private async Task RemoveAdminUser(TextCommandAdminUser AdminUser)
+    {
+        await Task.Run(() =>
+        {
+            AdminUsers.Remove(AdminUser);
+        });
+    }
+}
