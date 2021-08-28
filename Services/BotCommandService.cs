@@ -59,10 +59,7 @@ namespace YetAnotherTwitchBot.Services
             _commandManagementOptions.OnChange(UpdateCommandOptions);
             RegisterCallbacks();
             _twitchOptions.OnChange(SettingsUpdate);
-            if (_twitchOptions.CurrentValue.ConnectAtStartup)
-            {
-                StartIrc();
-            }
+            StartIrc();
         }
 
         private void UpdateCommandOptions(CommandManagementOptions Options)
@@ -94,6 +91,11 @@ namespace YetAnotherTwitchBot.Services
 
         public void StartIrc()
         {
+            if (!_twitchOptions.CurrentValue.Enabled)
+            {
+                _logger.LogInformation("Disbled. Skipping start");
+                return;
+            }
             _logger.LogInformation("Connecting...");
             ConnectionCredentials credentials = new ConnectionCredentials(_twitchOptions.CurrentValue.BotUsername, _twitchOptions.CurrentValue.BotIrcPassword);
             _client.Initialize(credentials, _twitchOptions.CurrentValue.Channels as List<string>);

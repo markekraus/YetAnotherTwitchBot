@@ -30,10 +30,7 @@ namespace YetAnotherTwitchBot.Services
             _spotifyOptions = SpotifyOptions;
             _settingsHelper = SettingsHelper;
             _spotifyOptions.OnChange(OnSettingsUpdated);
-            if(_spotifyOptions.CurrentValue.ConnectAtStartup)
-            {
-                Init();
-            }
+            Init();
         }
 
         private void OnSettingsUpdated(SpotifyOptions Options)
@@ -60,6 +57,11 @@ namespace YetAnotherTwitchBot.Services
 
         public void Start()
         {
+            if(!_spotifyOptions.CurrentValue.Enabled)
+            {
+                _logger.LogInformation("Disabled. Skipping start.");
+                return;
+            }
             var clientId = _spotifyOptions.CurrentValue.ClientId;
             var response = _spotifyOptions.CurrentValue.Token.GetAuthorizationCodeTokenResponse();
             var config = SpotifyClientConfig

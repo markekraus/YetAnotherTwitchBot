@@ -10,6 +10,6 @@ namespace YetAnotherTwitchBot.Options
         public string BotUsername { get; set; }
         public string StreamerUsername { get; set; }
         public IList<string> Channels { get; set; }
-        public bool ConnectAtStartup { get; set; }
+        public bool Enabled { get; set; } = false;
     }
 }
