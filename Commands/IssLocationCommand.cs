@@ -56,7 +56,7 @@ namespace YetAnotherTwitchBot.Commands
             try
             {
                 var loc = System.Text.Json.JsonSerializer.Deserialize<IssLocation>(result, options);
-                message = $"The international Space Station is currently at Longitude: {loc.IssPosition.Longitude}, Latitude: {loc.IssPosition.Latitude}.";
+                message = $"The International Space Station is currently at Longitude: {loc.IssPosition.Longitude}, Latitude: {loc.IssPosition.Latitude}.";
                 _logger.LogInformation($"Parsed Fact: '{message}'");
             }
             catch (System.Exception ex)
