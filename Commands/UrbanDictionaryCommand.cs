@@ -42,8 +42,10 @@ namespace YetAnotherTwitchBot.Commands
                 var ApiUrl = new Uri(string.Format(ApiUrlTemplate,ChatCommand.Parameters[0]));
                 var response = _client.GetAsync(ApiUrl).GetAwaiter().GetResult();
                 var definition = response.Content.ReadAsAsync<UrbanDictionaryResponse>().GetAwaiter().GetResult();
-                if(!string.IsNullOrWhiteSpace(definition.List[0].definition))
+                _logger.LogInformation("Processing complete.");
+                if(definition.List != null && definition.List.Count > 0 && !string.IsNullOrWhiteSpace(definition?.List[0]?.definition))
                 {
+                            _logger.LogInformation("Definition found. Modifying response...");
                             message = Regex.Replace(definition.List[0].definition, @"\r\n?|\n|\r", " ");
                             if(message.Length > 400)
                             {
@@ -54,6 +56,7 @@ namespace YetAnotherTwitchBot.Commands
                 }
                 else
                 {
+                    _logger.LogInformation("No definition found.");
                     message = $"Sorry @{ChatMessage.DisplayName}, I was unable to get an Urban Dictionary Definition.";
                 }
             }
