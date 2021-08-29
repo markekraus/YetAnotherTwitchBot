@@ -1,10 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using TwitchLib.Client.Models;
 using YetAnotherTwitchBot.Interfaces;
 using YetAnotherTwitchBot.Models;
 using YetAnotherTwitchBot.Options;
+using YetAnotherTwitchBot.Statics;
 
 namespace YetAnotherTwitchBot.Services
 {
@@ -13,26 +16,19 @@ namespace YetAnotherTwitchBot.Services
         private ILogger<TextCommandService> _logger;
         private IOptionsMonitor<TextCommandOptions> _options;
         private SettingsHelper _settingsHelper;
-        private IEnumerable<IBotCommand> _botCommands;
         public TextCommandService(
             ILogger<TextCommandService> Logger,
             IOptionsMonitor<TextCommandOptions> Options,
-            SettingsHelper SettingsHelper,
-            IEnumerable<IBotCommand> BotCommands)
+            SettingsHelper SettingsHelper)
         {
             _logger = Logger;
             _options = Options;
             _settingsHelper = SettingsHelper;
-            _botCommands = BotCommands;
         }
 
         public void AddTextCommand(TextCommand Command)
         {
-            if(
-                _botCommands.Any( command => command.GetCommandName().ToLowerInvariant() == Command.Command.ToLowerInvariant())
-                ||
-                _options.CurrentValue.Commands.Any( command => command.Command.ToLowerInvariant() == Command.Command.ToLowerInvariant())
-            )
+            if(_options.CurrentValue.Commands.Any( command => command.Command.ToLowerInvariant() == Command.Command.ToLowerInvariant()))
             {
                 var errorMessage = $"Command '{Command.Command}' already exists.";
                 _logger.LogError(errorMessage);
@@ -52,6 +48,32 @@ namespace YetAnotherTwitchBot.Services
         public IList<TextCommand> GetTextCommands()
         {
             return new List<TextCommand>(_options.CurrentValue.Commands);
+        }
+
+        public string ParseTemplate(TextCommand TextCommand, ChatMessage ChatMessage, TwitchChatCommand ChatCommand)
+        {
+            var response = TextCommand.Template;
+            var parseDictionary = new Dictionary<string, string>()
+            {
+                {Regex.Escape(TextCommandVariables.Channel),ChatMessage.Channel},
+                {Regex.Escape(TextCommandVariables.BotUsername),ChatMessage.BotUsername},
+                {Regex.Escape(TextCommandVariables.DisplayName),ChatMessage.DisplayName},
+                {Regex.Escape(TextCommandVariables.SubscribedMonthCount),ChatMessage.SubscribedMonthCount.ToString()},
+                {Regex.Escape(TextCommandVariables.Username),ChatMessage.Username},
+                {Regex.Escape(TextCommandVariables.Command),ChatCommand.Command}
+            };
+            if(ChatCommand.HasParameters)
+            {
+                for (int i = 0; i < ChatCommand.Parameters.Count; i++)
+                {
+                    parseDictionary.Add(Regex.Escape($"{{agr{i}}}"), ChatCommand.Parameters[i]);
+                }
+            }
+            foreach (var entry in parseDictionary)
+            {
+                response = Regex.Replace(response, entry.Key, entry.Value, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+            }
+            return response;
         }
 
         public void RemoveTextCommand(string CommandName)

@@ -57,6 +57,7 @@ public static class ServicesConfiguration
         // Text Commands
         services.Configure<TextCommandOptions>(Configuration.GetSection(TextCommandOptions.Section));
         services.AddSingleton<ITextCommandService, TextCommandService>();
+        services.AddSingleton<IBotCommand, TextCommandCommand>();
 
     }
 }
