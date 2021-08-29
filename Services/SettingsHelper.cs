@@ -10,6 +10,7 @@ namespace YetAnotherTwitchBot.Services
     public class SettingsHelper
     {
         private IWebHostEnvironment _env;
+        private object _lock = new Object();
         public SettingsHelper(IWebHostEnvironment Env)
         {
             _env = Env;
@@ -22,11 +23,18 @@ namespace YetAnotherTwitchBot.Services
                 fileName = $"appsettings.{_env.EnvironmentName}.json";
             }
             var filePath = Path.Combine(_env.ContentRootPath, fileName);
-            string json = File.ReadAllText(filePath);
+            string json; 
+            lock (_lock)
+            {
+                json = File.ReadAllText(filePath);
+            }
             dynamic jsonObj = JsonConvert.DeserializeObject(json);
             SetValueRecursively(sectionPathKey, jsonObj, value);
             string output = JsonConvert.SerializeObject(jsonObj, Formatting.Indented);
-            File.WriteAllText(filePath, output);
+            lock (_lock)
+            {
+                File.WriteAllText(filePath, output);
+            }
         }
 
         private void SetValueRecursively<T>(string sectionPathKey, dynamic jsonObj, T value)

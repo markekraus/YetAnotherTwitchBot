@@ -1,6 +1,6 @@
 namespace YetAnotherTwitchBot.Models
 {
-    public class TextCommandsItem
+    public class TextCommand
     {
         public string Command { get; set; }
         public string Template { get; set; }

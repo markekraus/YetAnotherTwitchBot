@@ -1,8 +1,9 @@
 @page "/textcommands"
-@using Microsoft.Extensions.Configuration
 @using Microsoft.Extensions.Options
 @using Models
 @using Services
+@using Interfaces
+@using System.Threading
 @using YetAnotherTwitchBot.Options
 
 <h1>Text Commands</h1>
@@ -74,31 +75,6 @@
         <button class="btn btn-success"  @onclick="AddCommand">Add</button>
     </div>
     <hr />
-    <h3>Admin Users</h3>
-@foreach (var user in AdminUsers)
-{
-    <div class="form-group row">
-        <div class="col-sm-10">
-            <InputText class="form-control" placeholder="SomeTwitchUser"
-                       @bind-Value="user.Username" />
-        </div>
-        <div class="col-sm-10">
-            <button class="btn btn-danger"  @onclick="@(() => RemoveAdminUser(user))">Remove</button>
-        </div>
-    </div>
-}
-    <hr />
-    <h4>Add Admin User</h4>
-    <div class="form-group row">
-        <div class="col-sm-10">
-            <InputText class="form-control" placeholder="SomeTwitchUser"
-                       @bind-Value="NewAdminUser.Username" />
-        </div>
-        <div class="col-sm-10">
-            <button class="btn btn-success"  @onclick="AddAdminUser">Add</button>
-        </div>
-    </div>
-    <hr />
     <div class="form-group row">
         <button type="submit" class="btn btn-primary">Save Changes</button>
     </div>
@@ -108,59 +84,42 @@
     [Inject]
     public SettingsHelper _settingsHelper { get; set; }
     [Inject]
-    private IOptionsMonitor<TextCommandsOptions> CommandOptions { get; set; }
-    public IList<TextCommandsItem> Commands { get; set; } = new List<TextCommandsItem>();
-    public IList<TextCommandAdminUser> AdminUsers { get; set; } = new List<TextCommandAdminUser>();
-    public TextCommandAdminUser NewAdminUser { get; set; } = new TextCommandAdminUser();
-    public TextCommandsItem NewCommand { get; set; } = new TextCommandsItem();
+    private ITextCommandService _service { get; set; }
+    public IList<TextCommand> Commands { get; set; } = new List<TextCommand>();
+    public TextCommand NewCommand { get; set; } = new TextCommand();
 
     protected async override Task OnInitializedAsync()
     {
         await Task.Run(() =>
         {
-            Commands = new List<TextCommandsItem>(CommandOptions.CurrentValue.Commands);
-            AdminUsers = new List<TextCommandAdminUser>(CommandOptions.CurrentValue.AdminUsers);
+            Commands = _service.GetTextCommands();
         });
     }
 
     private void HandleValidSubmit()
     {
-        var options = new TextCommandsOptions()
+        var newOptions = new TextCommandOptions()
         {
-            AdminUsers = AdminUsers,
             Commands = Commands
         };
-        _settingsHelper.AddOrUpdateAppSetting<TextCommandsOptions>(TextCommandsOptions.Section, options);
+        _service.UpdateSettings(newOptions);
+        Thread.Sleep(1000);
+        Commands = _service.GetTextCommands();
     }
 
     private void AddCommand()
     {
         Commands.Add(NewCommand);
-        NewCommand = new TextCommandsItem();
+        _service.AddTextCommand(NewCommand);
+        NewCommand = new TextCommand();
     }
 
-    private void AddAdminUser()
-    {
-        if (!string.IsNullOrWhiteSpace(NewAdminUser.Username))
-        {
-            AdminUsers.Add(NewAdminUser);
-            NewAdminUser = new TextCommandAdminUser();
-        }
-    }
-
-    private async Task RemoveCommand(TextCommandsItem Command)
+    private async Task RemoveCommand(TextCommand Command)
     {
         await Task.Run(() =>
         {
             Commands.Remove(Command);
-        });
-    }
-
-    private async Task RemoveAdminUser(TextCommandAdminUser AdminUser)
-    {
-        await Task.Run(() =>
-        {
-            AdminUsers.Remove(AdminUser);
+            _service.RemoveTextCommand(Command);
         });
     }
 }

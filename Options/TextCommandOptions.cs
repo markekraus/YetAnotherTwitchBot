@@ -3,10 +3,9 @@ using YetAnotherTwitchBot.Models;
 
 namespace YetAnotherTwitchBot.Options
 {
-    public class TextCommandsOptions
+    public class TextCommandOptions
     {
         public const string Section = "TextCommands";
-        public IList<TextCommandsItem> Commands { get; set; }
-        public IList<TextCommandAdminUser> AdminUsers { get; set; } = new List<TextCommandAdminUser>();
+        public IList<TextCommand> Commands { get; set; }
     }
 }
