@@ -105,8 +105,6 @@ Example response: @@MarkEKraus loves scotch and anime!<br />
 
 @code {
     [Inject]
-    public SettingsHelper _settingsHelper { get; set; }
-    [Inject]
     private ITextCommandService _service { get; set; }
     public IList<TextCommand> Commands { get; set; } = new List<TextCommand>();
     public TextCommand NewCommand { get; set; } = new TextCommand();

@@ -4,10 +4,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using YetAnotherTwitchBot.Interfaces;
 
 namespace YetAnotherTwitchBot.Services
 {
-    public class SettingsHelper
+    public class SettingsHelper : ISettingsHelper
     {
         private IWebHostEnvironment _env;
         private object _lock = new Object();

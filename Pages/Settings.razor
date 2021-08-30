@@ -1,9 +1,9 @@
 @page "/settings"
+@using Interfaces
 @using Microsoft.Extensions.Configuration
 @using Microsoft.Extensions.Logging
 @using Models
 @using Options
-@using Services
 
 <EditForm Model="@BotSettings" OnValidSubmit="@HandleValidSubmit">
     <h1>Settings</h1>
@@ -95,7 +95,7 @@
     [Inject]
     public ILogger<Settings> _logger { get; set; }
     [Inject]
-    public SettingsHelper _settingsHelper {get; set; }
+    public ISettingsHelper _settingsHelper {get; set; }
     public BotSettings BotSettings { get; set; } = new BotSettings();
     public string channels { get; set; } = "markekraus";
     protected async override Task OnInitializedAsync()

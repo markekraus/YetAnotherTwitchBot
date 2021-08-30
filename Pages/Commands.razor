@@ -33,7 +33,7 @@
     [Inject]
     public ILogger<Commands> _logger { get; set; }
     [Inject]
-    public SettingsHelper _settingsHelper {get; set; }
+    public ISettingsHelper _settingsHelper {get; set; }
     [Inject]
     IBotCommandService _service { get; set; }
     public CommandManagementOptions model = new CommandManagementOptions();

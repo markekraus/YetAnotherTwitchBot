@@ -15,11 +15,11 @@ namespace YetAnotherTwitchBot.Services
     {
         private ILogger<TextCommandService> _logger;
         private IOptionsMonitor<TextCommandOptions> _options;
-        private SettingsHelper _settingsHelper;
+        private ISettingsHelper _settingsHelper;
         public TextCommandService(
             ILogger<TextCommandService> Logger,
             IOptionsMonitor<TextCommandOptions> Options,
-            SettingsHelper SettingsHelper)
+            ISettingsHelper SettingsHelper)
         {
             _logger = Logger;
             _options = Options;

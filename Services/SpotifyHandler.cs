@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using YetAnotherTwitchBot.Options;
 using YetAnotherTwitchBot.Models;
+using YetAnotherTwitchBot.Interfaces;
 
 namespace YetAnotherTwitchBot.Services
 {
@@ -19,12 +20,12 @@ namespace YetAnotherTwitchBot.Services
         private static object _lock = new Object();
         private static bool loaded = false;
         private IOptionsMonitor<SpotifyOptions> _spotifyOptions;
-        private SettingsHelper _settingsHelper;
+        private ISettingsHelper _settingsHelper;
 
         public SpotifyHandler(
             ILogger<SpotifyHandler> logger,
             IOptionsMonitor<SpotifyOptions> SpotifyOptions,
-            SettingsHelper SettingsHelper)
+            ISettingsHelper SettingsHelper)
         {
             _logger = logger;
             _spotifyOptions = SpotifyOptions;

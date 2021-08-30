@@ -1,7 +1,6 @@
 @page "/spotify"
 @using Microsoft.Extensions.Options
 @using Services
-@using SpotifyAPI.Web
 @using YetAnotherTwitchBot.Options
 
 <h1>Spotify</h1>
@@ -32,8 +31,6 @@ else
     public IOptionsMonitor<SpotifyOptions> _options { get; set; }
     [Inject]
     public SpotifyHandler _service { get; set; }
-    [Inject]
-    public SettingsHelper _settingsHelper { get; set; }
     [Inject]
     public NavigationManager navManager { get; set; }
     private Uri _authUri;

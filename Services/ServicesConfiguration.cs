@@ -23,7 +23,7 @@ public static class ServicesConfiguration
             });
         services.Configure<TwitchOptions>(Configuration.GetSection(TwitchOptions.Section));
         services.Configure<CommandManagementOptions>(Configuration.GetSection(CommandManagementOptions.Section));
-        services.AddSingleton<SettingsHelper>();
+        services.AddSingleton<ISettingsHelper, SettingsHelper>();
         services.AddTransient<ITwitchClient, TwitchClient>();
         services.AddSingleton<IBotCommandService, BotCommandService>();
 
