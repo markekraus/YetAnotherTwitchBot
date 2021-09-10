@@ -59,5 +59,9 @@ public static class ServicesConfiguration
         services.AddSingleton<ITextCommandService, TextCommandService>();
         services.AddSingleton<IBotCommand, TextCommandCommand>();
 
+        // Executive Order command
+        services.AddHttpClient<ExecutiveOrderService>();
+        services.AddSingleton<IExecutiveOrderService, ExecutiveOrderService>();
+        services.AddSingleton<IBotCommand, ExecutiveOrderCommand>();
     }
 }
