@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -64,6 +65,18 @@ namespace YetAnotherTwitchBot.Services
                 }
             }
             _logger.LogInformation($"Initialized Executove Order list with {_executiveOrders.Count} items.");
+        }
+
+        public ExecutiveOrder Get(string OrderID)
+        {
+            try
+            {
+                return _executiveOrders.First( order => order.ExecutiveOrderNumber == OrderID);
+            }
+            catch (System.Exception)
+            {
+                throw new KeyNotFoundException($"OrderID '{OrderID}' notfound");
+            }
         }
     }
 }

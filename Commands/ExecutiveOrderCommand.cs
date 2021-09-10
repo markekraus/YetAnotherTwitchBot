@@ -35,7 +35,22 @@ namespace YetAnotherTwitchBot.Commands
 
         public string Run(ChatMessage ChatMessage, TwitchChatCommand ChatCommand)
         {
-            var order = _service.GetRandom();
+            ExecutiveOrder order;
+            if (ChatCommand.HasParameters)
+            {
+                try
+                {
+                    order = _service.Get(ChatCommand.Parameters[0]);
+                }
+                catch (System.Exception)
+                {
+                    return $"@{ChatMessage.DisplayName} I was unable to find Executive Order {ChatCommand.Parameters[0]}. I can only find EOs from Presidents Bill Clinton and later.";
+                }
+            }
+            else
+            {
+                order = _service.GetRandom();
+            }
             string date = $". Published on {order.PublicationDate.ToString("MMMM dd, yyyy")}";
             if(!string.IsNullOrWhiteSpace(order.SigningDate))
             {

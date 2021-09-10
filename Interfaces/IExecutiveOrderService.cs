@@ -6,6 +6,7 @@ namespace YetAnotherTwitchBot.Interfaces
     public interface IExecutiveOrderService
     {
         ExecutiveOrder GetRandom();
+        ExecutiveOrder Get(string OrderID);
         Task Init();
     }
 }
