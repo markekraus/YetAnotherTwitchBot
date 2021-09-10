@@ -36,7 +36,25 @@ namespace YetAnotherTwitchBot.Commands
         public string Run(ChatMessage ChatMessage, TwitchChatCommand ChatCommand)
         {
             var order = _service.GetRandom();
-            return $"EO {order.ExecutiveOrderNumber}: \"{order.Title}\" by President {order.President}. Published {order.PublicationDate.ToString("MMMM dd, yyyy")}";
+            string date = $". Published on {order.PublicationDate.ToString("MMMM dd, yyyy")}";
+            if(!string.IsNullOrWhiteSpace(order.SigningDate))
+            {
+                try
+                {
+                    date = DateTime.Parse(order.SigningDate).ToString("MMMM dd, yyyy");
+                    date = $" on {date}";
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, $"Unable to convert '{order.SigningDate}' to date for EO {order.ExecutiveOrderNumber}");
+                }
+            }
+            else
+            {
+                _logger.LogError($"No signing date for ");
+            }
+
+            return $"EO {order.ExecutiveOrderNumber}: \"{order.Title}\" signed by President {order.President}{date}";
         }
 
         public bool ShouldRun(string Command)

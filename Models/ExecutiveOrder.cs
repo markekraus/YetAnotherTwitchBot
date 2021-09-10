@@ -21,5 +21,7 @@ namespace YetAnotherTwitchBot.Models
         public string President;
         [JsonProperty(PropertyName = "executive_order_number")]
         public string ExecutiveOrderNumber;
+        [JsonProperty(PropertyName = "signing_date")]
+        public string SigningDate;
     }
 }

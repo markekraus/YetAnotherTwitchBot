@@ -12,7 +12,7 @@ namespace YetAnotherTwitchBot.Services
     {
         private ILogger<ExecutiveOrderService> _logger;
         private HttpClient _client;
-        private const string _searchUrlPattern = "https://www.federalregister.gov/api/v1/documents?fields%5B%5D=abstract&fields%5B%5D=document_number&fields%5B%5D=executive_order_number&fields%5B%5D=html_url&fields%5B%5D=pdf_url&fields%5B%5D=public_inspection_pdf_url&fields%5B%5D=publication_date&fields%5B%5D=title&fields%5B%5D&conditions%5Bpresident%5D%5B%5D={1}&conditions%5Bpresidential_document_type%5D%5B%5D=executive_order&conditions%5Btype%5D%5B%5D=PRESDOCU&format=json&page={0}&per_page=1000";
+        private const string _searchUrlPattern = "https://www.federalregister.gov/api/v1/documents?fields%5B%5D=abstract&fields%5B%5D=document_number&fields%5B%5D=executive_order_number&fields%5B%5D=html_url&fields%5B%5D=pdf_url&fields%5B%5D=public_inspection_pdf_url&fields%5B%5D=publication_date&fields%5B%5D=signing_date&fields%5B%5D=title&fields%5B%5D=type&conditions%5Bpresident%5D%5B%5D={1}&conditions%5Bpresidential_document_type%5D%5B%5D=executive_order&conditions%5Btype%5D%5B%5D=PRESDOCU&format=json&page={0}&per_page=1000";
         private Dictionary<string,string> _presidents = new Dictionary<string, string>()
         {
             {"william-j-clinton","Bill Clinton"},
@@ -29,7 +29,7 @@ namespace YetAnotherTwitchBot.Services
         {
             _logger = Logger;
             _client = Client;
-            Init();
+            var task = Init();
         }
         public ExecutiveOrder GetRandom()
         {
