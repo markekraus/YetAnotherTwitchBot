@@ -44,7 +44,7 @@ namespace YetAnotherTwitchBot.Commands
                 }
                 catch (System.Exception)
                 {
-                    return $"@{ChatMessage.DisplayName} I was unable to find Executive Order {ChatCommand.Parameters[0]}. I can only find EOs from Presidents Bill Clinton and later.";
+                    return $"@{ChatMessage.DisplayName} I was unable to find Executive Order {ChatCommand.Parameters[0]}. I can only find EOs {_service.GetMinOrderId()} - {_service.GetMaxOrderId()}.";
                 }
             }
             else

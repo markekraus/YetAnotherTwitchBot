@@ -7,6 +7,8 @@ namespace YetAnotherTwitchBot.Interfaces
     {
         ExecutiveOrder GetRandom();
         ExecutiveOrder Get(string OrderID);
+        int GetMinOrderId();
+        int GetMaxOrderId();
         Task Init();
     }
 }

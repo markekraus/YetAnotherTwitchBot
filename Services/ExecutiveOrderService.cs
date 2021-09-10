@@ -24,6 +24,8 @@ namespace YetAnotherTwitchBot.Services
         };
         private List<ExecutiveOrder> _executiveOrders;
         private Random random = new Random();
+        private int _minOrderID;
+        private int _maxOrderID;
         public ExecutiveOrderService(
             ILogger<ExecutiveOrderService> Logger,
             HttpClient Client)
@@ -65,6 +67,7 @@ namespace YetAnotherTwitchBot.Services
                 }
             }
             _logger.LogInformation($"Initialized Executove Order list with {_executiveOrders.Count} items.");
+            SetOrderIDRange();
         }
 
         public ExecutiveOrder Get(string OrderID)
@@ -77,6 +80,35 @@ namespace YetAnotherTwitchBot.Services
             {
                 throw new KeyNotFoundException($"OrderID '{OrderID}' notfound");
             }
+        }
+
+        public int GetMinOrderId()
+        {
+            return _minOrderID;
+        }
+
+        public int GetMaxOrderId()
+        {
+            return _maxOrderID;
+        }
+
+        private void SetOrderIDRange()
+        {
+            var orderIds = new List<int>();
+            foreach (var order in _executiveOrders)
+            {
+                if(int.TryParse(order.ExecutiveOrderNumber, out int orderId))
+                {
+                    orderIds.Add(orderId);
+                }
+                else
+                {
+                    _logger.LogError($"Unable to parse EO '{order.ExecutiveOrderNumber}' for Document {order.DocumentNumber}");
+                }
+            }
+            _minOrderID = orderIds.Min();
+            _maxOrderID = orderIds.Max();
+            _logger.LogInformation($"Min: {_minOrderID}, Max: {_maxOrderID}");
         }
     }
 }
