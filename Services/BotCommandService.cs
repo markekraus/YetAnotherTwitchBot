@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Timers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -28,6 +29,7 @@ namespace YetAnotherTwitchBot.Services
         private Dictionary<string, IBotCommand> _commandDictionary = new Dictionary<string, IBotCommand>(StringComparer.InvariantCultureIgnoreCase);
         private IOptionsMonitor<CommandManagementOptions> _commandManagementOptions;
         private List<CommandManagementItem> _commandManagementItems = new List<CommandManagementItem>();
+        private Timer _timeoutTimer;
         public BotCommandService(
             ILogger<BotCommandService> Logger,
             ITwitchClient TwitchClient,
@@ -46,6 +48,13 @@ namespace YetAnotherTwitchBot.Services
             _commandManagementOptions = CommandManagementOptions;
             _services = Services;
 
+            _timeoutTimer = new Timer()
+            {
+                AutoReset = false,
+                Interval = 600000
+            };
+            _timeoutTimer.Elapsed += OnPingTimeout;
+
             foreach (var command in _botCommands)
             {
                 if(!_commandDictionary.TryAdd(command.GetCommandName().ToLower(), command))
@@ -60,6 +69,18 @@ namespace YetAnotherTwitchBot.Services
             RegisterCallbacks();
             _twitchOptions.OnChange(SettingsUpdate);
             StartIrc();
+        }
+
+        private void OnPingTimeout(object sender, ElapsedEventArgs e)
+        {
+            _logger.LogError("Ping timeout exceeded. Reconnecting...");
+            lock (_lock)
+            {
+                StopIrc();
+                _client = _services.GetService<ITwitchClient>();
+                RegisterCallbacks();
+                StartIrc();
+            }
         }
 
         private void UpdateCommandOptions(CommandManagementOptions Options)
@@ -100,10 +121,12 @@ namespace YetAnotherTwitchBot.Services
             ConnectionCredentials credentials = new ConnectionCredentials(_twitchOptions.CurrentValue.BotUsername, _twitchOptions.CurrentValue.BotIrcPassword);
             _client.Initialize(credentials, _twitchOptions.CurrentValue.Channels as List<string>);
             _client.Connect();
+            _timeoutTimer.Start();
         }
 
         public void StopIrc()
         {
+            _timeoutTimer.Stop();
             if (_client.IsConnected)
             {
                 _logger.LogInformation("Disconnecting...");
@@ -150,6 +173,17 @@ namespace YetAnotherTwitchBot.Services
         {
             _client.OnLog += Client_OnLog;
             _client.OnMessageReceived += Client_OnMessageReceived;
+            _client.OnLog += PingCheck;
+        }
+
+        private void PingCheck(object sender, OnLogArgs e)
+        {
+            if(e.Data.Contains("PING :"))
+            {
+                _logger.LogInformation("Reseting PING timeout.");
+                _timeoutTimer.Stop();
+                _timeoutTimer.Start();
+            }
         }
 
         private void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
